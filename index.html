@@ -193,7 +193,6 @@ footer b { color: var(--ink); font-size: 13px; }
       <div class="stats">
         <div><b id="sFree">0</b><span>무료자료</span></div>
         <div><b id="sPaid">0</b><span>유료자료</span></div>
-        <div><b>12,480</b><span>누적 다운로드</span></div>
       </div>
     </div>
   </div>
@@ -227,7 +226,7 @@ footer b { color: var(--ink); font-size: 13px; }
   </section>
 
   <div class="note" id="guide">
-    <div><h4>파일 형식</h4><p>PDF는 바로 인쇄용, HWP·DOCX·XLSX·PPTX는 내용을 고쳐 쓸 수 있는 원본이에요.</p></div>
+    <div><h4>파일 형식</h4><p>PDF는 바로 인쇄용, HWP·DOCX·XLSX·PPTX는 고쳐 쓸 수 있는 원본이에요. 노션 템플릿은 링크를 열어 ‘복제’를 누르면 내 노션으로 가져가져요.</p></div>
     <div><h4>재다운로드</h4><p>구매한 자료는 마이페이지에서 기간 제한 없이 다시 받을 수 있어요.</p></div>
     <div><h4>이용 범위</h4><p>개인·수업 용도로 자유롭게 쓰되, 파일 자체를 재판매하거나 공유할 수 없어요.</p></div>
   </div>
@@ -237,7 +236,7 @@ footer b { color: var(--ink); font-size: 13px; }
   <div class="wrap">
     <b>자료창고</b>
     <span>상호 ○○○ · 대표 ○○○ · 사업자등록번호 000-00-00000 · 통신판매업신고 제0000-○○-0000호</span>
-    <span>문의 help@example.com · 아래 자료 목록은 레이아웃 확인용 예시예요.</span>
+    <span>문의 help@example.com</span>
   </div>
 </footer>
 
@@ -272,16 +271,8 @@ footer b { color: var(--ink); font-size: 13px; }
 
 <script>
 const items = [
-  {id:1, t:"주간 학습 계획표", cat:"플래너", fmt:"PDF", pages:4, price:0, dl:3210, file:"files/weekly-planner.pdf"},
-  {id:2, t:"오답노트 기본 양식", cat:"학습", fmt:"HWP", pages:2, price:0, dl:2875, file:"files/wrong-answer-note.hwp"},
-  {id:3, t:"월간 가계부 시트", cat:"재테크", fmt:"XLSX", pages:1, price:0, dl:1940, file:"files/monthly-budget.xlsx"},
-  {id:4, t:"자기소개서 작성 가이드 맛보기", cat:"취업", fmt:"PDF", pages:6, price:0, dl:1532, file:"files/cover-letter-guide.pdf"},
-  {id:5, t:"중등 수학 개념 요약 전 단원", cat:"학습", fmt:"PDF", pages:48, price:9900, was:14900},
-  {id:6, t:"합격 자기소개서 첨삭 모음 30편", cat:"취업", fmt:"DOCX", pages:92, price:19000},
-  {id:7, t:"1년 자동 가계부 (그래프 포함)", cat:"재테크", fmt:"XLSX", pages:13, price:6500},
-  {id:8, t:"발표용 템플릿 세트 40장", cat:"디자인", fmt:"PPTX", pages:40, price:12000, was:15000},
-  {id:9, t:"영어 회화 패턴 300", cat:"학습", fmt:"PDF", pages:64, price:8800},
-  {id:10, t:"2027 다이어리 속지 전체", cat:"플래너", fmt:"PDF", pages:120, price:5500},
+  // 무료자료: 노션 템플릿이면 link에 노션 공유 링크, 파일이면 file:"files/파일이름" 을 넣어요
+  {id:1, t:"12가지 영어 지문구조법", cat:"영어", fmt:"PDF", price:0, file:"files/english-passage-structure.pdf"},
 ];
 const won = n => n.toLocaleString("ko-KR") + "원";
 let filter = "all", cart = new Set();
@@ -301,10 +292,10 @@ function card(i) {
     <div class="body">
       <span class="cat">${i.cat}</span>
       <h3>${i.t}</h3>
-      <div class="meta"><span>${i.pages}쪽</span>${isFree ? `<span>${i.dl.toLocaleString()}회 다운로드</span>` : ""}</div>
+      <div class="meta"><span>${i.link ? "노션 템플릿" : i.pages ? i.pages + "쪽" : i.fmt + " 파일"}</span>${isFree && i.dl ? `<span>${i.dl.toLocaleString()}회 다운로드</span>` : ""}</div>
       <div class="foot">
         <span class="price">${isFree ? "무료" : (i.was ? `<s>${won(i.was)}</s>` : "") + won(i.price)}</span>
-        ${isFree ? `<button class="act" data-dl="${i.id}">다운로드</button>`
+        ${isFree ? `<button class="act" data-dl="${i.id}">${i.link ? "노션에서 복제" : "다운로드"}</button>`
                  : `<button class="act ${inCart ? "in" : ""}" data-cart="${i.id}">${inCart ? "담김 ✓" : "장바구니"}</button>`}
       </div>
     </div></article>`;
@@ -317,7 +308,7 @@ function render() {
   $("free-sec").hidden = filter === "paid";
   $("paid-sec").hidden = filter === "free";
   $("freeGrid").innerHTML = f.map(card).join("") || `<p class="empty">조건에 맞는 무료자료가 없어요.</p>`;
-  $("paidGrid").innerHTML = p.map(card).join("") || `<p class="empty">조건에 맞는 유료자료가 없어요.</p>`;
+  $("paidGrid").innerHTML = p.map(card).join("") || `<p class="empty">${paid.length ? "조건에 맞는 유료자료가 없어요." : "유료자료는 준비 중이에요. 곧 올라올 예정이에요."}</p>`;
   renderCart();
 }
 
@@ -393,6 +384,15 @@ function openModal(m, why) {
   setTimeout(() => (m === "join" ? $("fName") : $("fEmail")).focus(), 0);
 }
 function download(it) {
+  if (it.link) {
+    // 노션 템플릿: 공유 링크를 새 탭으로 열어요
+    if (!/^https:\/\//.test(it.link)) { toast(`'${it.t}' 노션 링크가 아직 연결되지 않았어요`); return; }
+    const a = document.createElement("a");
+    a.href = it.link; a.target = "_blank"; a.rel = "noopener";
+    document.body.appendChild(a); a.click(); a.remove();
+    toast("노션이 열리면 오른쪽 위 ‘복제’를 눌러 내 노션에 가져가세요");
+    return;
+  }
   // 실제 파일: 저장소의 files 폴더에 같은 이름으로 올려 두면 내려받아져요
   if (!it.file) { toast(`'${it.t}' 파일이 아직 연결되지 않았어요`); return; }
   const a = document.createElement("a");
